@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mlflow-config
+data:
+  MLFLOW_TRACKING_URI: "http://<MLFLOW_HOST>:30600"
+  MLFLOW_S3_ENDPOINT_URL: "http://<MINIO_HOST>:30900"
+  AWS_ACCESS_KEY_ID: "<MINIO_ACCESS_KEY>"
+  AWS_SECRET_ACCESS_KEY: "<MINIO_SECRET_KEY>"
+  MLFLOW_S3_BUCKET: "mlflow"

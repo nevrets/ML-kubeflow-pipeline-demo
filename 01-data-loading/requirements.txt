@@ -1,0 +1,10 @@
+# pandas
+# loguru
+# lakefs-client
+# requests
+# scipy
+# boto3
+# mlflow
+# scikit-learn
+# seaborn
+# matplotlib

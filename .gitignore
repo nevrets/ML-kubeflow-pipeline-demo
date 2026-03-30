@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+
+# Company internal configs
+config.py
+.gitlab-ci.yml

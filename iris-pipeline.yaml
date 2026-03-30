@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: nevret-iris-
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.8.22, pipelines.kubeflow.org/pipeline_compilation_time: '2024-02-26T17:25:28.869569',
+    pipelines.kubeflow.org/pipeline_spec: '{"description": "nevret iris test", "name":
+      "nevret-iris"}'}
+  labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.8.22}
+spec:
+  entrypoint: nevret-iris
+  templates:
+  - name: load-iris-data-pipeline
+    container:
+      args: [--data_path, ./Iris.csv]
+      command: [python, load_data.py]
+      image: nevret/nevret-iris-preprocessing:0.5
+    outputs:
+      parameters:
+      - name: load-iris-data-pipeline-iris
+        valueFrom: {path: /iris.csv}
+      artifacts:
+      - {name: load-iris-data-pipeline-iris, path: /iris.csv}
+    metadata:
+      labels:
+        pipelines.kubeflow.org/kfp_sdk_version: 1.8.22
+        pipelines.kubeflow.org/pipeline-sdk-type: kfp
+        pipelines.kubeflow.org/enable_caching: "true"
+  - name: nevret-iris
+    dag:
+      tasks:
+      - {name: load-iris-data-pipeline, template: load-iris-data-pipeline}
+      - name: training-pipeline
+        template: training-pipeline
+        dependencies: [load-iris-data-pipeline]
+        arguments:
+          parameters:
+          - {name: load-iris-data-pipeline-iris, value: '{{tasks.load-iris-data-pipeline.outputs.parameters.load-iris-data-pipeline-iris}}'}
+  - name: training-pipeline
+    container:
+      args: [--data, '{{inputs.parameters.load-iris-data-pipeline-iris}}']
+      command: [python, train.py]
+      image: nevret/nevret-iris-training:0.5
+    inputs:
+      parameters:
+      - {name: load-iris-data-pipeline-iris}
+    metadata:
+      labels:
+        pipelines.kubeflow.org/kfp_sdk_version: 1.8.22
+        pipelines.kubeflow.org/pipeline-sdk-type: kfp
+        pipelines.kubeflow.org/enable_caching: "true"
+  arguments:
+    parameters: []
+  serviceAccountName: pipeline-runner
