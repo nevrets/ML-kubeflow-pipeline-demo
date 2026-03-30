@@ -4,3 +4,7 @@ __pycache__/
 # Company internal configs
 config.py
 .gitlab-ci.yml
+
+# Compiled pipeline packages
+package/
+*.tar.gz
